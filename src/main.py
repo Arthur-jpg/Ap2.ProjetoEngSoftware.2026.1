@@ -15,9 +15,13 @@ def main():
     args = parser.parse_args()
 
     if args.fase is None or args.fase == 1:
-        log.info("=== Fase 1: Descoberta de repos ===")
-        from github_discovery import run_fase1
-        run_fase1()
+        from config import REPOS_JSON
+        if args.fase is None and REPOS_JSON.exists():
+            log.info("=== Fase 1: pulada (repos.json já existe) ===")
+        else:
+            log.info("=== Fase 1: Descoberta de repos ===")
+            from github_discovery import run_fase1
+            run_fase1()
 
     if args.fase is None or args.fase == 2:
         log.info("=== Fase 2: Clone & build ===")
