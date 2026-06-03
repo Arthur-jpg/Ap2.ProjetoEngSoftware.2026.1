@@ -23,7 +23,7 @@ REPO_HEADERS = {
 }
 
 TARGET = 10
-CANDIDATE_POOL = 50  # coleta 50 candidatos, pega os 10 com mais estrelas
+CANDIDATE_POOL = 100  # coleta 50 candidatos, pega os 10 com mais estrelas
 REQ_INTERVAL = 2.5
 
 SIGNAL_QUERIES = [
@@ -102,22 +102,30 @@ def run_fase1():
 
     REPOS_JSON.parent.mkdir(parents=True, exist_ok=True)
 
-    # Passo 1: coletar exatamente TARGET repos Java+Claude
+    # Passo 1: coletar candidatos (language:java na query filtra commits, não o repo principal)
     repos: dict[str, dict] = {}
     _collect_repos(repos)
-    log.info("%d candidatos Java+Claude encontrados. Buscando estrelas...", len(repos))
+    log.info("%d candidatos encontrados. Verificando linguagem e estrelas...", len(repos))
 
-    # Passo 2: buscar estrelas (uma chamada por repo, só TARGET calls)
+    # Passo 2: buscar metadados e filtrar SOMENTE repos cuja linguagem principal é Java
+    java_repos = []
     for full_name, info in repos.items():
         meta = _fetch_stars(full_name)
+        if meta["language"] != "Java":
+            log.info("  ignorado %-40s (linguagem: %s)", full_name, meta["language"])
+            continue
         info.update(meta)
-        log.info("  %-45s %6d estrelas", full_name, info["stars"])
+        log.info("  Java OK  %-40s %6d estrelas", full_name, info["stars"])
+        java_repos.append(info)
         time.sleep(1)
 
-    # Passo 3: ordenar por estrelas e salvar
-    top10 = sorted(repos.values(), key=lambda r: r["stars"], reverse=True)[:TARGET]
+    if len(java_repos) < TARGET:
+        log.warning("Apenas %d repos Java encontrados (esperado %d). Aumente CANDIDATE_POOL.", len(java_repos), TARGET)
 
-    log.info("Top %d por estrelas:", TARGET)
+    # Passo 3: top 10 Java por estrelas
+    top10 = sorted(java_repos, key=lambda r: r["stars"], reverse=True)[:TARGET]
+
+    log.info("Top %d Java+Claude por estrelas:", len(top10))
     for r in top10:
         log.info("  %-45s %6d estrelas  %s", r["full_name"], r["stars"], r["signals"])
 

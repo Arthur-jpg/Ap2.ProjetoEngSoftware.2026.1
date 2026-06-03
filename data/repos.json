@@ -1,122 +1,142 @@
 [
   {
-    "full_name": "codeflash-ai/codeflash",
-    "owner": "codeflash-ai",
-    "repo": "codeflash",
+    "full_name": "sivaprasadreddy/talk-to-repo",
+    "owner": "sivaprasadreddy",
+    "repo": "talk-to-repo",
     "signals": [
       "co_authored_by"
     ],
-    "stars": 246,
+    "stars": 9,
     "default_branch": "main",
-    "pushed_at": "2026-06-01T10:51:05Z",
-    "language": "Python"
+    "pushed_at": "2026-04-28T05:50:26Z",
+    "language": "Java",
+    "claude_confirmed": true,
+    "build_ok": true
   },
   {
-    "full_name": "paiml/paiml-mcp-agent-toolkit",
-    "owner": "paiml",
-    "repo": "paiml-mcp-agent-toolkit",
+    "full_name": "adamzwasserman/honest-code-traces",
+    "owner": "adamzwasserman",
+    "repo": "honest-code-traces",
     "signals": [
       "co_authored_by"
     ],
-    "stars": 153,
+    "stars": 1,
+    "default_branch": "main",
+    "pushed_at": "2026-05-21T14:05:43Z",
+    "language": "Java",
+    "claude_confirmed": true,
+    "build_ok": false
+  },
+  {
+    "full_name": "Kyu-seok/CodeBite",
+    "owner": "Kyu-seok",
+    "repo": "CodeBite",
+    "signals": [
+      "co_authored_by"
+    ],
+    "stars": 1,
     "default_branch": "master",
-    "pushed_at": "2026-05-06T00:16:30Z",
-    "language": "Rust"
+    "pushed_at": "2026-05-06T14:10:19Z",
+    "language": "Java",
+    "claude_confirmed": true,
+    "build_ok": false
   },
   {
-    "full_name": "davidgeorgehope/elastic-launch-demo",
-    "owner": "davidgeorgehope",
-    "repo": "elastic-launch-demo",
+    "full_name": "nxmatic/rke2lab",
+    "owner": "nxmatic",
+    "repo": "rke2lab",
     "signals": [
       "co_authored_by"
     ],
-    "stars": 6,
+    "stars": 1,
     "default_branch": "main",
-    "pushed_at": "2026-05-21T17:35:04Z",
-    "language": "Python"
+    "pushed_at": "2026-06-01T13:09:58Z",
+    "language": "Java",
+    "claude_confirmed": true,
+    "build_ok": false
   },
   {
-    "full_name": "yviscool/Synapse",
-    "owner": "yviscool",
-    "repo": "Synapse",
+    "full_name": "cloudempiere/com.cloudempiere.searchindex",
+    "owner": "cloudempiere",
+    "repo": "com.cloudempiere.searchindex",
     "signals": [
       "co_authored_by"
     ],
-    "stars": 6,
+    "stars": 1,
+    "default_branch": "master",
+    "pushed_at": "2026-06-02T18:42:38Z",
+    "language": "Java",
+    "claude_confirmed": true,
+    "build_ok": false
+  },
+  {
+    "full_name": "akrishnanDG/schematizer-skill",
+    "owner": "akrishnanDG",
+    "repo": "schematizer-skill",
+    "signals": [
+      "co_authored_by"
+    ],
+    "stars": 0,
     "default_branch": "main",
-    "pushed_at": "2026-03-17T17:29:12Z",
-    "language": "TypeScript"
+    "pushed_at": "2026-04-13T06:22:32Z",
+    "language": "Java",
+    "claude_confirmed": true,
+    "build_ok": false
   },
   {
-    "full_name": "elvezjp/code2map",
-    "owner": "elvezjp",
-    "repo": "code2map",
+    "full_name": "tim-mila/golf-api",
+    "owner": "tim-mila",
+    "repo": "golf-api",
     "signals": [
       "co_authored_by"
     ],
-    "stars": 6,
+    "stars": 0,
     "default_branch": "main",
-    "pushed_at": "2026-06-01T06:05:04Z",
-    "language": "Python"
+    "pushed_at": "2026-05-29T16:42:14Z",
+    "language": "Java",
+    "claude_confirmed": true,
+    "build_ok": false
   },
   {
-    "full_name": "cuioss/plan-marshall",
-    "owner": "cuioss",
-    "repo": "plan-marshall",
+    "full_name": "JackZho/android-library-system",
+    "owner": "JackZho",
+    "repo": "android-library-system",
     "signals": [
       "co_authored_by"
     ],
-    "stars": 5,
-    "default_branch": "main",
-    "pushed_at": "2026-06-02T13:34:59Z",
-    "language": "Python"
+    "stars": 0,
+    "default_branch": "master",
+    "pushed_at": "2026-04-04T13:46:35Z",
+    "language": "Java",
+    "claude_confirmed": true,
+    "build_ok": false
   },
   {
-    "full_name": "SecurityRonin/blazehash",
-    "owner": "SecurityRonin",
-    "repo": "blazehash",
+    "full_name": "JackZho/MusicPlayer",
+    "owner": "JackZho",
+    "repo": "MusicPlayer",
     "signals": [
       "co_authored_by"
     ],
-    "stars": 5,
-    "default_branch": "main",
-    "pushed_at": "2026-05-05T08:25:51Z",
-    "language": "Rust"
+    "stars": 0,
+    "default_branch": "master",
+    "pushed_at": "2026-04-04T13:57:58Z",
+    "language": "Java",
+    "claude_confirmed": true,
+    "build_ok": false
   },
   {
-    "full_name": "optivem/shop",
-    "owner": "optivem",
-    "repo": "shop",
+    "full_name": "shossain786/utem-core",
+    "owner": "shossain786",
+    "repo": "utem-core",
     "signals": [
       "co_authored_by"
     ],
-    "stars": 5,
-    "default_branch": "main",
-    "pushed_at": "2026-06-02T01:12:37Z",
-    "language": "TypeScript"
-  },
-  {
-    "full_name": "Algiras/debugium",
-    "owner": "Algiras",
-    "repo": "debugium",
-    "signals": [
-      "co_authored_by"
-    ],
-    "stars": 4,
-    "default_branch": "main",
-    "pushed_at": "2026-03-16T10:19:18Z",
-    "language": "Rust"
-  },
-  {
-    "full_name": "aliyun/aliyun-odps-openapi-sdk",
-    "owner": "aliyun",
-    "repo": "aliyun-odps-openapi-sdk",
-    "signals": [
-      "co_authored_by"
-    ],
-    "stars": 4,
-    "default_branch": "develop",
-    "pushed_at": "2026-06-01T05:01:09Z",
-    "language": "Python"
+    "stars": 0,
+    "default_branch": "master",
+    "pushed_at": "2026-03-24T15:33:04Z",
+    "language": "Java",
+    "claude_confirmed": true,
+    "build_ok": true
   }
 ]
