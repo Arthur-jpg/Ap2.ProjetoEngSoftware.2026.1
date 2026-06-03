@@ -1,0 +1,7 @@
+.env
+data/raw/
+data/dataset.csv
+tools/SourceMeter/
+__pycache__/
+*.pyc
+.DS_Store

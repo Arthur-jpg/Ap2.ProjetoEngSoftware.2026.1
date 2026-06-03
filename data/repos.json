@@ -1,0 +1,122 @@
+[
+  {
+    "full_name": "codeflash-ai/codeflash",
+    "owner": "codeflash-ai",
+    "repo": "codeflash",
+    "signals": [
+      "co_authored_by"
+    ],
+    "stars": 246,
+    "default_branch": "main",
+    "pushed_at": "2026-06-01T10:51:05Z",
+    "language": "Python"
+  },
+  {
+    "full_name": "paiml/paiml-mcp-agent-toolkit",
+    "owner": "paiml",
+    "repo": "paiml-mcp-agent-toolkit",
+    "signals": [
+      "co_authored_by"
+    ],
+    "stars": 153,
+    "default_branch": "master",
+    "pushed_at": "2026-05-06T00:16:30Z",
+    "language": "Rust"
+  },
+  {
+    "full_name": "davidgeorgehope/elastic-launch-demo",
+    "owner": "davidgeorgehope",
+    "repo": "elastic-launch-demo",
+    "signals": [
+      "co_authored_by"
+    ],
+    "stars": 6,
+    "default_branch": "main",
+    "pushed_at": "2026-05-21T17:35:04Z",
+    "language": "Python"
+  },
+  {
+    "full_name": "yviscool/Synapse",
+    "owner": "yviscool",
+    "repo": "Synapse",
+    "signals": [
+      "co_authored_by"
+    ],
+    "stars": 6,
+    "default_branch": "main",
+    "pushed_at": "2026-03-17T17:29:12Z",
+    "language": "TypeScript"
+  },
+  {
+    "full_name": "elvezjp/code2map",
+    "owner": "elvezjp",
+    "repo": "code2map",
+    "signals": [
+      "co_authored_by"
+    ],
+    "stars": 6,
+    "default_branch": "main",
+    "pushed_at": "2026-06-01T06:05:04Z",
+    "language": "Python"
+  },
+  {
+    "full_name": "cuioss/plan-marshall",
+    "owner": "cuioss",
+    "repo": "plan-marshall",
+    "signals": [
+      "co_authored_by"
+    ],
+    "stars": 5,
+    "default_branch": "main",
+    "pushed_at": "2026-06-02T13:34:59Z",
+    "language": "Python"
+  },
+  {
+    "full_name": "SecurityRonin/blazehash",
+    "owner": "SecurityRonin",
+    "repo": "blazehash",
+    "signals": [
+      "co_authored_by"
+    ],
+    "stars": 5,
+    "default_branch": "main",
+    "pushed_at": "2026-05-05T08:25:51Z",
+    "language": "Rust"
+  },
+  {
+    "full_name": "optivem/shop",
+    "owner": "optivem",
+    "repo": "shop",
+    "signals": [
+      "co_authored_by"
+    ],
+    "stars": 5,
+    "default_branch": "main",
+    "pushed_at": "2026-06-02T01:12:37Z",
+    "language": "TypeScript"
+  },
+  {
+    "full_name": "Algiras/debugium",
+    "owner": "Algiras",
+    "repo": "debugium",
+    "signals": [
+      "co_authored_by"
+    ],
+    "stars": 4,
+    "default_branch": "main",
+    "pushed_at": "2026-03-16T10:19:18Z",
+    "language": "Rust"
+  },
+  {
+    "full_name": "aliyun/aliyun-odps-openapi-sdk",
+    "owner": "aliyun",
+    "repo": "aliyun-odps-openapi-sdk",
+    "signals": [
+      "co_authored_by"
+    ],
+    "stars": 4,
+    "default_branch": "develop",
+    "pushed_at": "2026-06-01T05:01:09Z",
+    "language": "Python"
+  }
+]
