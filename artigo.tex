@@ -1,0 +1,302 @@
+\documentclass[12pt]{article}
+
+\usepackage{sbc-template}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[brazil]{babel}
+\usepackage{graphicx,url}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{hyperref}
+
+\sloppy
+\urlstyle{same}
+
+\title{Análise de Métricas de Qualidade em Código Java com Contribuição de Inteligência Artificial}
+
+\author{Arthur Schiller\inst{1}, Marceu Filho\inst{1}}
+
+\address{Projeto de Engenharia de Software\\
+Instituto Brasileiro de Mercado de Capitais (IBMEC) -- Brasil\\
+\email{arthur.schiller@exemplo.com, marceu.filho@exemplo.com}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This work presents a statistical analysis of object-oriented code metrics in Java repositories where Claude (Anthropic) acted as a contributor. A pipeline was developed to automatically discover, clone, and extract metrics from ten repositories, generating a dataset of 1{,}191 classes. The analysis covers descriptive statistics, normality testing, outlier detection, code smell identification based on metric thresholds, cyclomatic complexity (McCC), Spearman correlation, and principal component analysis with clustering. Results show strongly right-skewed distributions, high structural correlations among size, complexity, and interaction metrics, and identifiable patterns of code smells in AI-assisted code. The clustering identified three distinct class archetypes, suggesting that AI-generated code covers a wide structural range rather than a uniform pattern.
+\end{abstract}
+
+\begin{resumo}
+Este trabalho apresenta uma análise estatística de métricas de código orientado a objetos em repositórios Java onde o Claude (Anthropic) atuou como contribuidor. Um pipeline foi desenvolvido para descobrir, clonar e extrair métricas automaticamente de dez repositórios, gerando uma base com 1{,}191 classes. A análise abrange estatística descritiva, testes de normalidade, detecção de outliers, identificação de code smells por limiares de métricas, complexidade ciclomática (McCC), correlação de Spearman e análise de componentes principais com agrupamento. Os resultados evidenciam distribuições fortemente assimétricas à direita, correlações estruturais elevadas entre métricas de tamanho, complexidade e interação, e padrões identificáveis de code smells em código com assistência de IA. O agrupamento identificou três arquétipos distintos de classes, sugerindo que o código produzido com IA abrange uma ampla faixa estrutural, e não um padrão uniforme.
+\end{resumo}
+
+\section{Introdução}
+
+O uso de assistentes de inteligência artificial generativa no desenvolvimento de software cresce rapidamente. Ferramentas como o Claude, da Anthropic, são capazes de propor, revisar e até mesmo commitar código diretamente em repositórios, tornando-se contribuidores efetivos em projetos reais. Nesse contexto, surge uma questão relevante para a engenharia de software: qual é o perfil estrutural do código produzido com esse tipo de assistência?
+
+As métricas de Chidamber e Kemerer \cite{ck1994} consolidaram a ideia de que propriedades estruturais como complexidade, acoplamento, coesão e herança podem ser usadas como indicadores de qualidade e manutenibilidade. Estudos posteriores reforçaram que essas métricas se correlacionam com a facilidade de manutenção e com a presença de code smells \cite{basili1996,fowler1999}. Entretanto, ainda não há evidência empírica consolidada sobre como o código gerado com contribuição de IA se posiciona nessas dimensões.
+
+Este trabalho tem como objetivo caracterizar estatisticamente o código presente em repositórios Java onde o Claude foi identificado como contribuidor, por meio de métricas OO extraídas automaticamente de 1{,}191 classes de dez repositórios distintos. A análise não pressupõe a disponibilidade de dados de defeitos — que são escassos e difíceis de coletar em projetos pequenos — e centra-se nas propriedades estruturais do código como indicadores independentes de qualidade.
+
+\section{Metodologia}
+
+\subsection{Seleção e coleta dos dados}
+
+A seleção dos repositórios foi realizada automaticamente por meio da API de busca de commits do GitHub, utilizando dois sinais de presença do Claude: (a) mensagem de commit com \texttt{Co-Authored-By: Claude <noreply@anthropic.com>}; (b) nome ou e-mail do autor contendo referência ao Claude ou ao domínio \texttt{@anthropic.com}. Entre os repositórios que satisfizeram ao menos um sinal e foram confirmados como projetos Java, foram selecionados os dez com maior número de estrelas.
+
+Os repositórios selecionados foram: \textit{sivaprasadreddy/talk-to-repo}, \textit{adamzwasserman/honest-code-traces}, \textit{Kyu-seok/CodeBite}, \textit{nxmatic/rke2lab}, \textit{cloudempiere/com.cloudempiere.searchindex}, \textit{akrishnanDG/schematizer-skill}, \textit{tim-mila/golf-api}, \textit{JackZho/android-library-system}, \textit{JackZho/MusicPlayer} e \textit{shossain786/utem-core}.
+
+\subsection{Extração de métricas}
+
+As métricas OO foram extraídas diretamente dos arquivos-fonte \texttt{.java} por meio de análise sintática com a biblioteca \texttt{javalang}. Para cada classe foram computadas: LOC (linhas de código), CLOC (linhas de comentário), WMC (soma da complexidade ciclomática dos métodos), CBO (acoplamento por importações), RFC (métodos da classe mais chamadas externas), DIT (profundidade de herança), LCOM5 (falta de coesão), NM (número de métodos) e NPM (número de métodos públicos). A complexidade ciclomática por método foi agregada em duas colunas: \texttt{McCC\_avg} (média por classe) e \texttt{McCC\_max} (máximo por classe).
+
+\subsection{Pré-processamento}
+
+Foram removidas colunas de identificação (\texttt{class}, \texttt{file}) e as colunas de análise estática, que permaneceram zeradas por não serem fornecidas pelo extrator baseado em fonte. Após a remoção de linhas com valores ausentes (principalmente nas métricas McCC de classes sem métodos), a base analítica final ficou com \textbf{1{,}191 classes} e \textbf{11 métricas}. Todas as decisões inferenciais foram interpretadas ao nível de significância $\alpha = 0{,}05$.
+
+\subsection{Análise estatística}
+
+A análise foi dividida em seis blocos: (i) estatística descritiva; (ii) distribuição e normalidade (histogramas e teste de Kolmogorov-Smirnov); (iii) detecção de outliers pelo critério IQR; (iv) detecção de code smells por limiares da literatura; (v) análise de complexidade ciclomática (McCC); (vi) correlação de Spearman e análise de componentes principais com agrupamento por K-Means ($k=3$). A análise foi conduzida em Python com as bibliotecas \texttt{pandas}, \texttt{scipy}, \texttt{scikit-learn} e \texttt{seaborn}.
+
+\section{Resultados e Discussão}
+
+\subsection{Estatística descritiva}
+
+A Tabela~\ref{tab:desc} resume as principais medidas descritivas das métricas centrais. Em todas as variáveis, a média superou substancialmente a mediana, indicando distribuições assimétricas à direita e concentração de valores extremos em uma minoria de classes.
+
+\begin{table}[H]
+\centering
+\caption{Resumo descritivo das métricas estruturais (1.191 classes)}
+\label{tab:desc}
+\small
+\begin{tabular}{lrrrrrrr}
+\toprule
+Variável & Média & Mediana & Q1 & Q3 & Máximo & Amplitude & DP \\
+\midrule
+LOC      & 138,44 & 110 &  32,5 & 188,5 & 1485 & 1479 & 142,52 \\
+CLOC     &   9,75 &   2 &   1,0 &  11,0 &  396 &  396 &  20,89 \\
+WMC      &   7,53 &   5 &   1,0 &  10,0 &  115 &  115 &   9,43 \\
+CBO      &   5,05 &   4 &   2,0 &   7,0 &   22 &   22 &   4,36 \\
+RFC      &  42,97 &  18 &   6,0 &  39,0 &  818 &  817 &  75,15 \\
+DIT      &   0,23 &   0 &   0,0 &   0,0 &    1 &    1 &   0,42 \\
+LCOM5    &   0,43 &  0,5 &  0,0 &  0,85 &    1 &    1 &   0,41 \\
+NM       &   5,64 &   4 &   1,0 &   8,0 &   84 &   84 &   5,91 \\
+NPM      &   4,44 &   2 &   1,0 &   7,0 &   84 &   84 &   5,89 \\
+McCC\_avg &   1,33 &   1 &   1,0 &   1,2 &   12 &   11 &   0,89 \\
+McCC\_max &   3,10 &   1 &   1,0 &   3,0 &   46 &   45 &   3,89 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+LOC apresentou média de 138,44 e mediana de 110, com máximo de 1485, revelando que a maioria das classes é de médio porte, mas com existência de classes excepcionalmente extensas. WMC, com média de 7,53 e máximo de 115, indica que a complexidade se concentra em uma minoria. CBO apresentou média de 5,05 e mediana de 4, sugerindo baixo a moderado acoplamento na maior parte das classes. RFC, com média de 42,97 e máximo de 818, revela alta superfície de interação em algumas classes específicas.
+
+DIT apresentou média de 0,23 e mediana de 0, indicando que a grande maioria das classes não utiliza herança — o valor máximo é 1. Esse resultado é notável: código com contribuição da IA tende a preferir composição a herança, ou simplesmente a criar classes de nível plano. LCOM5, com média de 0,43 e mediana de 0,5, indica coesão moderada, em escala de 0 (totalmente coesa) a 1 (sem coesão).
+
+\subsection{Distribuição dos dados e normalidade}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{notebooks/normalidade.png}
+\caption{Histogramas com curvas de densidade para as principais métricas}
+\label{fig:normalidade}
+\end{figure}
+
+Os histogramas da Figura~\ref{fig:normalidade} confirmam forte assimetria à direita em todas as métricas. No teste de Kolmogorov-Smirnov, adotando hipótese nula de normalidade, todos os p-valores foram inferiores a $10^{-30}$, com estatística $D$ variando entre 0,18 (LOC) e 0,48 (DIT). A hipótese de normalidade foi rejeitada em 100\% das variáveis, justificando o uso de estatísticas robustas e correlação de Spearman nas análises subsequentes.
+
+\subsection{Identificação de outliers}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{notebooks/boxplot.png}
+\caption{Boxplots das métricas pelo critério IQR}
+\label{fig:boxplots}
+\end{figure}
+
+Os boxplots da Figura~\ref{fig:boxplots} evidenciam grande concentração de pontos extremos. RFC apresentou a maior proporção de outliers (12,2\%), seguido por CLOC (10,5\%), McCC\_max (17,4\%) e McCC\_avg (16,8\%). DIT, por ser quase binário (0 ou 1), apresentou 23,3\% de outliers pelo critério IQR, mas isso reflete a distribuição discreta da variável, não necessariamente anomalias de qualidade.
+
+Sob a perspectiva de engenharia de software, os outliers em LOC, WMC e RFC podem corresponder a classes de coordenação, repositórios de dados ou componentes centrais de infraestrutura — arquétipos comuns em projetos assistidos por IA que tendem a gerar código scaffolding ou classes de configuração extensas.
+
+\subsection{Detecção de code smells}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{notebooks/code_smells.png}
+\caption{Incidência de code smells por threshold (métricas CK)}
+\label{fig:smells}
+\end{figure}
+
+A Figura~\ref{fig:smells} e a Tabela~\ref{tab:smells} apresentam a incidência de cinco padrões de code smell identificados pelos limiares da literatura \cite{fowler1999,lanza2006}.
+
+\begin{table}[H]
+\centering
+\caption{Incidência de code smells nos repositórios analisados}
+\label{tab:smells}
+\small
+\begin{tabular}{lrr}
+\toprule
+Code Smell & Critério & Incidência \\
+\midrule
+God Class          & WMC $>$ 20 e LCOM5 $>$ 0,7  & 53 classes (4,5\%) \\
+Alta Complexidade  & McCC\_max $>$ 10              & 172 classes (14,4\%) \\
+Acoplamento Excessivo & CBO $>$ 14                & 52 classes (4,4\%) \\
+Classe Grande      & LOC $>$ 500                  & 32 classes (2,7\%) \\
+Interface Inchada  & NPM $>$ 20                   & 21 classes (1,8\%) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+O smell de maior incidência foi Alta Complexidade ciclomática (14,4\%), seguido por God Class (4,5\%) e Acoplamento Excessivo (4,4\%). A elevada presença de métodos com McCC\_max $>$ 10 sugere que, embora o código assistido por IA tenda a ser estruturalmente simples na mediana (McCC\_max mediano = 1), uma fração não desprezível apresenta métodos com fluxo de controle muito ramificado — potencialmente funções de parsing, mapeamento ou lógica de negócio complexa gerada em bloco.
+
+\subsection{Complexidade ciclomática (McCC)}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{notebooks/mccc.png}
+\caption{Distribuição de McCC\_avg e McCC\_max, e dispersão com WMC}
+\label{fig:mccc}
+\end{figure}
+
+A complexidade ciclomática média por classe (McCC\_avg) apresentou média de 1,33 e mediana de 1,00, indicando que a maioria das classes possui métodos simples, sem ramificações. No entanto, o percentil 95 de McCC\_avg foi de 3,0 e o de McCC\_max atingiu 11,0, revelando a presença de classes com métodos altamente ramificados nas caudas da distribuição.
+
+A correlação de Spearman entre McCC\_avg e WMC foi $\rho = 0{,}553$ (moderada), e entre McCC\_avg e McCC\_max foi $\rho = 0{,}926$ (muito forte). Isso indica que, embora McCC e WMC capturem dimensões relacionadas da complexidade, eles não são redundantes: WMC é a soma das complexidades por método (inclui quantidade), enquanto McCC\_avg representa a intensidade média do fluxo de controle. Classes com muitos métodos simples têm WMC alto mas McCC\_avg baixo; classes com poucos métodos muito ramificados têm o padrão inverso.
+
+\subsection{Análise de correlação}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.90\textwidth]{notebooks/correlacao.png}
+\caption{Matriz de correlação de Spearman entre as métricas analisadas}
+\label{fig:correlacao}
+\end{figure}
+
+A Figura~\ref{fig:correlacao} apresenta a matriz de correlação de Spearman. Os pares com $|\rho| \geq 0{,}70$ foram:
+
+\begin{itemize}
+  \item WMC $\times$ NM: $\rho = +0{,}939$ — altíssima correlação, esperada, pois mais métodos implica maior WMC total.
+  \item WMC $\times$ LCOM5: $\rho = +0{,}759$ — classes com maior complexidade tendem a ser menos coesas.
+  \item NM $\times$ LCOM5: $\rho = +0{,}814$ — idem para quantidade de métodos e coesão.
+  \item NM $\times$ NPM: $\rho = +0{,}701$ — a maioria dos métodos definidos é pública.
+  \item LOC $\times$ RFC: $\rho = +0{,}857$ — classes maiores oferecem maior superfície de resposta.
+  \item CBO $\times$ RFC: $\rho = +0{,}732$ — classes mais acopladas interagem mais.
+  \item McCC\_avg $\times$ McCC\_max: $\rho = +0{,}926$ — as duas medidas de ciclomática crescem juntas.
+\end{itemize}
+
+Correlações negativas fracas foram observadas entre DIT e McCC (DIT $\times$ McCC\_max: $\rho = -0{,}119$), sugerindo que classes em hierarquias de herança (mesmo que raras neste conjunto) tendem a ser ligeiramente menos complexas individualmente.
+
+\subsection{Análise de componentes principais e agrupamento}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.90\textwidth]{notebooks/pca_clusters.png}
+\caption{Projeção PCA e perfil normalizado dos clusters}
+\label{fig:pca}
+\end{figure}
+
+A análise de componentes principais revelou que PC1 e PC2, juntos, explicam aproximadamente 50--60\% da variância total. PC1 captura principalmente a dimensão de tamanho e complexidade (LOC, WMC, NM, RFC), enquanto PC2 está associada a acoplamento e interação (CBO, RFC).
+
+O agrupamento K-Means com $k=3$ identificou três arquétipos de classes:
+
+\begin{itemize}
+  \item \textbf{Cluster 1 — Classes simples}: baixo LOC, WMC e CBO. Representam a maioria das classes do conjunto — métodos curtos, pouco acoplamento, complexidade ciclomática próxima de 1. Típicas de classes de modelo, DTOs e utilitários simples.
+  \item \textbf{Cluster 2 — Classes de serviço}: LOC e RFC moderados, CBO mais elevado. Interagem com vários componentes externos. Típicas de classes de serviço, controladores e repositórios.
+  \item \textbf{Cluster 3 — Classes complexas}: valores elevados em LOC, WMC, RFC e McCC\_max. Representam as classes mais desafiadoras do ponto de vista de manutenibilidade — potencialmente God Classes ou componentes centrais de infraestrutura.
+\end{itemize}
+
+A existência desses três arquétipos distintos sugere que o código com contribuição de IA não é uniforme: abrange desde classes auxiliares simples até componentes estruturalmente densos, de forma semelhante ao que se observa em projetos Java convencionais.
+
+\subsection{Comparação entre repositórios}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{notebooks/repos_comparacao.png}
+\caption{Comparação de métricas médias por repositório}
+\label{fig:repos}
+\end{figure}
+
+A Figura~\ref{fig:repos} revela heterogeneidade significativa entre os repositórios. O projeto \textit{cloudempiere/com.cloudempiere.searchindex} apresentou os maiores valores médios de LOC (228) e WMC (20,18), enquanto \textit{Kyu-seok/CodeBite} concentrou a maior parte das classes simples (WMC médio = 3,66, LOC médio = 37,60). O projeto \textit{shossain786/utem-core} destacou-se pelo maior CBO médio (10,41) e RFC médio (151,17), sugerindo forte integração entre componentes. Essa variabilidade reflete a diversidade de domínios de aplicação dos projetos — desde APIs REST e sistemas Android até componentes de infraestrutura.
+
+\section{Ameaças à Validade}
+
+Em relação à \textbf{validade externa}, a análise foi conduzida sobre dez repositórios Java identificados como tendo contribuição do Claude, o que não permite generalizações automáticas para outras linguagens, outros modelos de IA ou projetos sem detecção explícita do sinal de contribuição.
+
+Quanto à \textbf{validade de construto}, as métricas extraídas foram obtidas por análise sintática dos arquivos-fonte, sem compilação ou execução do código. Algumas métricas, como CBO (aproximado por importações) e RFC (aproximado por chamadas de método no texto), representam estimativas e não garantem equivalência exata com as definições originais de Chidamber e Kemerer. A ausência de dados de defeitos confiáveis impediu a análise de correlação com bugs, o que limita conclusões sobre qualidade preditiva.
+
+Em relação à \textbf{validade interna}, as correlações observadas não implicam causalidade. A presença do Claude como contribuidor foi detectada por sinais de commit, o que não exclui a possibilidade de que parte do código analisado seja de autoria humana. Não foi possível isolar estatisticamente as classes escritas exclusivamente pela IA.
+
+\section{Conclusão}
+
+Este trabalho apresentou uma análise estatística de métricas OO em código Java de repositórios com contribuição do Claude. Os resultados mostram que, na mediana, o código é relativamente simples: classes de 110 linhas, complexidade ciclomática média próxima de 1 e acoplamento moderado. No entanto, as caudas das distribuições revelam a presença de classes estruturalmente densas, com elevados valores de WMC, RFC e McCC\_max.
+
+A análise de code smells identificou que 14,4\% das classes apresentam alta complexidade ciclomática (McCC\_max $>$ 10) e 4,5\% configuram potenciais God Classes. A análise de agrupamento revelou três arquétipos estruturais distintos, sugerindo que o código com contribuição de IA não é uniforme e abrange desde utilitários simples até componentes de coordenação complexos.
+
+As correlações estruturais encontradas — especialmente entre tamanho, complexidade e interação — são consistentes com o que a literatura reporta para projetos Java em geral, o que sugere que o código com contribuição de IA replica padrões estruturais conhecidos. A principal distinção observada foi a baixíssima utilização de herança (DIT mediano = 0), indicando preferência por composição ou por estruturas planas.
+
+Como continuidade, estudos futuros podem comparar diretamente métricas de repositórios com e sem contribuição de IA, isolando commits individuais atribuídos ao modelo, e incorporar métricas de processo como frequência de mudanças e tempo de vida das classes.
+
+\newpage
+\section{Repositório do Projeto}
+
+O material completo deste trabalho, incluindo o pipeline de coleta, os scripts de análise, o dataset gerado e os arquivos auxiliares, está disponível em repositório GitHub.
+
+\begin{thebibliography}{99}
+
+\bibitem{ck1994}
+Chidamber, S. R.; Kemerer, C. F. A metrics suite for object oriented design.
+\textit{IEEE Transactions on Software Engineering}, v. 20, n. 6, p. 476--493, 1994.
+
+\bibitem{basili1996}
+Basili, V. R.; Briand, L. C.; Melo, W. L. A validation of object-oriented design metrics as quality indicators.
+\textit{IEEE Transactions on Software Engineering}, v. 22, n. 10, p. 751--761, 1996.
+
+\bibitem{fowler1999}
+Fowler, M. \textit{Refactoring: Improving the Design of Existing Code}. Boston: Addison-Wesley, 1999.
+
+\bibitem{lanza2006}
+Lanza, M.; Marinescu, R. \textit{Object-Oriented Metrics in Practice}. Berlin: Springer, 2006.
+
+\bibitem{github2024}
+GitHub. Copilot and AI-assisted development. Disponível em:
+\url{https://github.com/features/copilot}. Acesso em: 9 jun. 2026.
+
+\bibitem{anthropic2024}
+Anthropic. Claude. Disponível em:
+\url{https://www.anthropic.com/claude}. Acesso em: 9 jun. 2026.
+
+\end{thebibliography}
+
+\newpage
+\appendix
+\section{Apêndice: Descrição das Métricas Utilizadas}
+
+\begin{table}[H]
+\centering
+\caption{Definição resumida das métricas analisadas}
+\label{tab:metricas}
+\small
+\begin{tabular}{p{0.18\textwidth} p{0.72\textwidth}}
+\toprule
+\textbf{Métrica} & \textbf{Definição} \\
+\midrule
+LOC      & Linhas de código da classe (indicador de tamanho). \\
+CLOC     & Linhas de comentário da classe. \\
+WMC      & Soma da complexidade ciclomática de todos os métodos da classe. \\
+CBO      & Acoplamento entre objetos: número de pacotes importados distintos. \\
+RFC      & Conjunto de resposta da classe: métodos próprios mais chamadas externas detectadas. \\
+DIT      & Profundidade na hierarquia de herança (0 = sem herança). \\
+LCOM5    & Falta de coesão entre métodos (0 = totalmente coesa, 1 = sem coesão). \\
+NM       & Número total de métodos definidos na classe. \\
+NPM      & Número de métodos públicos definidos na classe. \\
+McCC\_avg & Média da complexidade ciclomática (McCabe) por método da classe. \\
+McCC\_max & Maior complexidade ciclomática entre os métodos da classe. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}

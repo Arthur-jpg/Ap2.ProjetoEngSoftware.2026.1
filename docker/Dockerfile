@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk
+FROM eclipse-temurin:11-jdk-jammy
 
 RUN apt-get update && apt-get install -y \
     git \
@@ -7,6 +7,10 @@ RUN apt-get update && apt-get install -y \
     unzip \
     python3 \
     python3-pip \
+    libstdc++6 \
+    libgomp1 \
+    libtinfo5 \
+    libncurses5 \
     && rm -rf /var/lib/apt/lists/*
 
 # Gradle
@@ -24,6 +28,7 @@ RUN wget -q https://github.com/spotbugs/spotbugs/releases/download/${SPOTBUGS_VE
 ENV SPOTBUGS_HOME=/opt/spotbugs-${SPOTBUGS_VERSION}
 ENV PATH="${SPOTBUGS_HOME}/bin:${PATH}"
 
+
 WORKDIR /app
 
 COPY requirements.txt .
@@ -31,9 +36,5 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY src/ ./src/
 
-# tools/ e data/ são montados em runtime via -v
-# SourceMeter: esperado em /app/tools/SourceMeter/ (download manual)
-ENV SOURCEMETER_HOME=/app/tools/SourceMeter
-ENV PATH="${SOURCEMETER_HOME}:${PATH}"
-
-CMD ["python3", "src/main.py"]
+ENTRYPOINT ["python3", "src/main.py"]
+CMD []

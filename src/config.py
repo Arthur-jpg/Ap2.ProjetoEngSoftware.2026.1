@@ -7,7 +7,6 @@ DATA_DIR = ROOT / "data"
 RAW_DIR = DATA_DIR / "raw"
 REPOS_JSON = DATA_DIR / "repos.json"
 DATASET_CSV = DATA_DIR / "dataset.csv"
-SOURCEMETER_HOME = Path("/app/tools/SourceMeter")
 SPOTBUGS_HOME = Path("/opt/spotbugs-4.8.6")
 
 # --- Detecção do Claude ---

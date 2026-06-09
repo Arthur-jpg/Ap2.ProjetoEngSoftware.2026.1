@@ -11,7 +11,11 @@
     "pushed_at": "2026-04-28T05:50:26Z",
     "language": "Java",
     "claude_confirmed": true,
-    "build_ok": true
+    "build_ok": true,
+    "sourcemeter_ok": true,
+    "class_csv": "/app/data/raw/sivaprasadreddy__talk-to-repo/sourcemeter/Class.csv",
+    "method_csv": "/app/data/raw/sivaprasadreddy__talk-to-repo/sourcemeter/Method.csv",
+    "spotbugs_ok": true
   },
   {
     "full_name": "adamzwasserman/honest-code-traces",
@@ -25,7 +29,11 @@
     "pushed_at": "2026-05-21T14:05:43Z",
     "language": "Java",
     "claude_confirmed": true,
-    "build_ok": false
+    "build_ok": false,
+    "sourcemeter_ok": true,
+    "class_csv": "/app/data/raw/adamzwasserman__honest-code-traces/sourcemeter/Class.csv",
+    "method_csv": "/app/data/raw/adamzwasserman__honest-code-traces/sourcemeter/Method.csv",
+    "spotbugs_ok": false
   },
   {
     "full_name": "Kyu-seok/CodeBite",
@@ -39,7 +47,11 @@
     "pushed_at": "2026-05-06T14:10:19Z",
     "language": "Java",
     "claude_confirmed": true,
-    "build_ok": false
+    "build_ok": false,
+    "sourcemeter_ok": true,
+    "class_csv": "/app/data/raw/Kyu-seok__CodeBite/sourcemeter/Class.csv",
+    "method_csv": "/app/data/raw/Kyu-seok__CodeBite/sourcemeter/Method.csv",
+    "spotbugs_ok": false
   },
   {
     "full_name": "nxmatic/rke2lab",
@@ -53,7 +65,11 @@
     "pushed_at": "2026-06-01T13:09:58Z",
     "language": "Java",
     "claude_confirmed": true,
-    "build_ok": false
+    "build_ok": false,
+    "sourcemeter_ok": true,
+    "class_csv": "/app/data/raw/nxmatic__rke2lab/sourcemeter/Class.csv",
+    "method_csv": "/app/data/raw/nxmatic__rke2lab/sourcemeter/Method.csv",
+    "spotbugs_ok": false
   },
   {
     "full_name": "cloudempiere/com.cloudempiere.searchindex",
@@ -67,7 +83,11 @@
     "pushed_at": "2026-06-02T18:42:38Z",
     "language": "Java",
     "claude_confirmed": true,
-    "build_ok": false
+    "build_ok": false,
+    "sourcemeter_ok": true,
+    "class_csv": "/app/data/raw/cloudempiere__com.cloudempiere.searchindex/sourcemeter/Class.csv",
+    "method_csv": "/app/data/raw/cloudempiere__com.cloudempiere.searchindex/sourcemeter/Method.csv",
+    "spotbugs_ok": false
   },
   {
     "full_name": "akrishnanDG/schematizer-skill",
@@ -81,7 +101,11 @@
     "pushed_at": "2026-04-13T06:22:32Z",
     "language": "Java",
     "claude_confirmed": true,
-    "build_ok": false
+    "build_ok": false,
+    "sourcemeter_ok": true,
+    "class_csv": "/app/data/raw/akrishnanDG__schematizer-skill/sourcemeter/Class.csv",
+    "method_csv": "/app/data/raw/akrishnanDG__schematizer-skill/sourcemeter/Method.csv",
+    "spotbugs_ok": false
   },
   {
     "full_name": "tim-mila/golf-api",
@@ -95,7 +119,11 @@
     "pushed_at": "2026-05-29T16:42:14Z",
     "language": "Java",
     "claude_confirmed": true,
-    "build_ok": false
+    "build_ok": false,
+    "sourcemeter_ok": true,
+    "class_csv": "/app/data/raw/tim-mila__golf-api/sourcemeter/Class.csv",
+    "method_csv": "/app/data/raw/tim-mila__golf-api/sourcemeter/Method.csv",
+    "spotbugs_ok": false
   },
   {
     "full_name": "JackZho/android-library-system",
@@ -109,7 +137,11 @@
     "pushed_at": "2026-04-04T13:46:35Z",
     "language": "Java",
     "claude_confirmed": true,
-    "build_ok": false
+    "build_ok": false,
+    "sourcemeter_ok": true,
+    "class_csv": "/app/data/raw/JackZho__android-library-system/sourcemeter/Class.csv",
+    "method_csv": "/app/data/raw/JackZho__android-library-system/sourcemeter/Method.csv",
+    "spotbugs_ok": false
   },
   {
     "full_name": "JackZho/MusicPlayer",
@@ -123,7 +155,11 @@
     "pushed_at": "2026-04-04T13:57:58Z",
     "language": "Java",
     "claude_confirmed": true,
-    "build_ok": false
+    "build_ok": false,
+    "sourcemeter_ok": true,
+    "class_csv": "/app/data/raw/JackZho__MusicPlayer/sourcemeter/Class.csv",
+    "method_csv": "/app/data/raw/JackZho__MusicPlayer/sourcemeter/Method.csv",
+    "spotbugs_ok": false
   },
   {
     "full_name": "shossain786/utem-core",
@@ -137,6 +173,10 @@
     "pushed_at": "2026-03-24T15:33:04Z",
     "language": "Java",
     "claude_confirmed": true,
-    "build_ok": true
+    "build_ok": true,
+    "sourcemeter_ok": true,
+    "class_csv": "/app/data/raw/shossain786__utem-core/sourcemeter/Class.csv",
+    "method_csv": "/app/data/raw/shossain786__utem-core/sourcemeter/Method.csv",
+    "spotbugs_ok": true
   }
 ]
