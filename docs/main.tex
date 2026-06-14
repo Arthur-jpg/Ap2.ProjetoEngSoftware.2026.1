@@ -1,0 +1,324 @@
+\documentclass[12pt]{article}
+
+\usepackage{sbc-template}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[brazil]{babel}
+\usepackage{graphicx,url}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{hyperref}
+
+\sloppy
+\urlstyle{same}
+
+\title{Análise Estatística de Métricas de Código-Fonte do Elasticsearch}
+
+\author{Arthur Schiller\inst{1}, Marceu Filho\inst{1}}
+
+\address{Projeto de Engenharia de Software\\
+Instituto Brasileiro de Mercado de Capitais (IBMEC) -- Brasil\\
+\email{arthur.schiller@exemplo.com, marceu.filho@exemplo.com}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This work presents a statistical analysis of source code metrics from the Elasticsearch framework using data from the GitHub Bug Dataset. The objective was to investigate structural properties of the code, identify distributional patterns, evaluate associations among software metrics, and assess whether selected static metrics help explain defect occurrence. The analysis included data integration, variable screening, descriptive statistics, graphical exploration, outlier detection, normality testing, correlation analysis, and logistic regression. The results show strongly right-skewed distributions, substantial concentration of outliers in size- and complexity-related metrics, strong structural correlations among size, complexity, and interaction measures, and only limited explanatory power of the selected metrics for bug occurrence. Although complexity and coupling were associated with higher defect probability, the strong class imbalance and weak direct correlations with defects indicate that structural metrics alone are insufficient for robust defect prediction.
+\end{abstract}
+
+\begin{resumo}
+Este trabalho apresenta uma análise estatística de métricas de código-fonte do framework Elasticsearch a partir de dados do GitHub Bug Dataset. O objetivo foi investigar propriedades estruturais do código, identificar padrões de distribuição, avaliar associações entre métricas de software e verificar em que medida métricas estáticas ajudam a explicar a ocorrência de defeitos. A análise incluiu integração e filtragem dos dados, estatística descritiva, exploração gráfica, identificação de outliers, testes de normalidade, análise de correlação e regressão logística. Os resultados evidenciam distribuições fortemente assimétricas à direita, elevada concentração de outliers em métricas ligadas a tamanho e complexidade, correlações fortes entre medidas estruturais e baixo poder explicativo das métricas selecionadas em relação à ocorrência de bugs. Embora complexidade e acoplamento tenham se mostrado associadas a maior probabilidade de defeito, o forte desbalanceamento da variável resposta e a baixa associação direta com bugs indicam que métricas estruturais, isoladamente, não são suficientes para predizer defeitos de forma robusta.
+\end{resumo}
+
+\section{Introdução}
+
+A crescente complexidade dos sistemas de software torna essencial o uso de abordagens quantitativas para compreender características internas do código-fonte e sua relação com qualidade, manutenção e defeitos. Nesse contexto, métricas de software oferecem uma forma objetiva de avaliar propriedades estruturais, como tamanho, complexidade, acoplamento e coesão, permitindo análises comparativas e inferências sobre o comportamento de projetos reais.
+
+Entre as propostas clássicas de mensuração em orientação a objetos, destacam-se as métricas de Chidamber e Kemerer, que consolidaram a ideia de que atributos estruturais do código podem ser usados como indicadores de qualidade e manutenibilidade \cite{ck1994}. Posteriormente, estudos empíricos reforçaram que tais métricas podem estar associadas a defeitos, embora sua capacidade explicativa isolada costume ser limitada \cite{basili1996}.
+
+Este trabalho tem como foco o framework \textit{Elasticsearch}, uma plataforma amplamente utilizada para busca, indexação e análise de grandes volumes de dados. Desenvolvido em Java, o Elasticsearch é um projeto de grande porte e relevância prática, o que o torna um objeto adequado para estudos estatísticos baseados em métricas de código-fonte. Sua utilização em aplicações distribuídas e ambientes com alta demanda por desempenho também reforça a importância de compreender como suas características estruturais podem ser analisadas quantitativamente \cite{elastic}.
+
+A análise foi conduzida com base no \textit{GitHub Bug Dataset}, conforme proposto nas instruções da atividade. O enunciado exige uma análise estatística completa, contemplando medidas descritivas, visualizações gráficas, detecção de outliers, testes de normalidade, correlação e modelagem estatística \cite{githubbugdataset}. Dessa forma, o objetivo deste artigo é estruturar e documentar o processo de análise estatística dos dados do Elasticsearch, desde a integração e tratamento da base até a interpretação dos resultados.
+
+\section{Metodologia}
+
+A metodologia adotada neste trabalho foi estruturada em etapas sequenciais, com o objetivo de garantir organização analítica, reprodutibilidade e aderência às exigências da atividade proposta. Salvo indicação em contrário, todas as decisões inferenciais do estudo foram interpretadas ao nível de significância de \(\alpha = 0{,}05\).
+
+\subsection{Seleção do dataset}
+
+Foi selecionado o framework Java \textit{Elasticsearch} a partir do \textit{GitHub Bug Dataset}, utilizando-se a versão mais recente disponível para o projeto, conforme exigido no enunciado da atividade. A escolha do Elasticsearch se justifica por sua relevância prática, por seu porte e pela disponibilidade de um conjunto rico de métricas estruturais de código-fonte \cite{githubbugdataset,elastic}.
+
+\subsection{Integração e pré-processamento dos dados}
+
+Seguindo a orientação adotada em sala, a análise foi iniciada a partir da integração entre os datasets disponíveis para o projeto, resultando em uma base com 7.263 observações e 124 colunas. Após a junção das bases, foram inspecionadas colunas duplicadas geradas pelo \textit{merge}. Seis variáveis duplicadas foram removidas por apresentarem a versão \texttt{.y} inteiramente ausente, enquanto as respectivas versões \texttt{.x} continham a informação válida.
+
+Em seguida, foram excluídas 10 colunas de identificação, texto e metadados posicionais (\texttt{ID}, \texttt{Name}, \texttt{LongName}, \texttt{Parent}, \texttt{Component}, \texttt{Path}, \texttt{Line}, \texttt{Column}, \texttt{EndLine} e \texttt{EndColumn}), por não representarem propriedades quantitativas relevantes para a análise estatística.
+
+Posteriormente, foram removidas variáveis totalmente ausentes e variáveis constantes, uma vez que não contribuem com variabilidade, correlação ou modelagem. Na sequência, foi aplicada uma triagem de redundância por correlação de Spearman, adotando-se como critério de alta redundância o limiar absoluto de \(|\rho| > 0{,}95\). Nessa etapa, foram identificados 61 pares de variáveis altamente correlacionadas, sendo mantida em cada caso a métrica mais interpretável ou mais consolidada na literatura.
+
+Por fim, foi aplicada uma triagem de \textit{near-zero variance} apenas aos preditores, utilizando os critérios \texttt{freqRatio > 19} e \texttt{percentUnique < 10}. A variável resposta não foi submetida a esse filtro, pois, apesar de rara, representa o fenômeno central de interesse do estudo.
+
+
+\subsection{Definição das variáveis finais}
+
+Após as etapas de filtragem, foi definida uma base analítica final com 15 variáveis, selecionadas por combinarem cobertura conceitual das principais dimensões de qualidade de software com baixa redundância estatística. As variáveis finais foram: LOC e CLOC, relacionadas a tamanho e volume de código; WMC, relacionada à complexidade; CBO e RFC, relacionadas a acoplamento e interação; DIT, relacionada à herança; LCOM5, relacionada à coesão; NM e NPM, relacionadas à composição e à interface pública da classe; WarningMajor, Design Rules, Coupling Metric Rules, Documentation Metric Rules e Size Metric Rules, relacionadas à análise estática; e Number of bugs, utilizada como variável resposta.
+
+Essa seleção foi guiada por critérios estatísticos e substantivos. Do ponto de vista estatístico, foram excluídas variáveis altamente correlacionadas, constantes, totalmente ausentes ou com variabilidade extremamente baixa. Do ponto de vista substantivo, foram priorizadas métricas mais interpretáveis e mais recorrentes na literatura de métricas orientadas a objetos, de modo a permitir uma discussão tecnicamente consistente sobre tamanho, complexidade, acoplamento, coesão, herança e defeitos.
+
+
+\subsection{Análise estatística}
+
+A análise estatística foi dividida em cinco blocos. No primeiro, foram calculadas medidas descritivas de tendência central, dispersão e posição relativa, incluindo média, mediana, moda quando aplicável, amplitude, variância, desvio padrão, quartis e percentis. No segundo, foram construídas visualizações gráficas, com destaque para histogramas, boxplots, gráficos de dispersão e gráficos de barras. No terceiro, foram aplicados testes de normalidade, com ênfase no teste de Kolmogorov-Smirnov, complementado pela inspeção gráfica das distribuições. No quarto, foram avaliadas correlações entre variáveis por meio de matriz de correlação e do pacote \texttt{PerformanceAnalytics}. No quinto, a variável \textit{Number of bugs} foi transformada em uma variável binária de presença/ausência de defeito, permitindo o ajuste de modelos de regressão logística \cite{hosmer2013}.
+
+Os modelos logísticos foram comparados com base em quatro critérios explícitos: (i) valor do AIC, utilizado para equilibrar ajuste e parcimônia; (ii) pseudo $R^2$ de McFadden, utilizado como medida de capacidade explicativa; (iii) significância dos coeficientes ao nível de \(\alpha = 0{,}05\); e (iv) capacidade discriminativa medida pela área sob a curva ROC (AUC). Essa abordagem foi considerada adequada porque a variável resposta original é discreta, fortemente assimétrica e altamente desbalanceada.
+
+\subsection{Ferramentas utilizadas}
+
+A análise foi conduzida na linguagem R, com apoio do RStudio para execução dos scripts estatísticos e Google Colab. O material completo do projeto, incluindo scripts, dataset, figuras e arquivos auxiliares, será disponibilizado em repositório GitHub.
+
+\section{Resultados e Discussão}
+
+\subsection{Estatística descritiva}
+
+A análise descritiva evidenciou forte heterogeneidade estrutural entre as classes do Elasticsearch. Em praticamente todas as métricas centrais, a média superou substancialmente a mediana, indicando distribuições assimétricas à direita e concentração de valores extremos em uma pequena parcela das observações.
+
+A Tabela~\ref{tab:desc} resume as principais medidas descritivas de sete variáveis centrais do estudo, selecionadas por representarem tamanho, complexidade, acoplamento, interação, herança, coesão e defeitos. As demais variáveis da base final foram analisadas no notebook, mas não foram incluídas na tabela principal para preservar legibilidade no artigo.
+
+\begin{table}[H]
+\centering
+\caption{Resumo descritivo das principais métricas estruturais e da variável resposta}
+\label{tab:desc}
+\small
+\begin{tabular}{lrrrrrrrr}
+\toprule
+Variável & Média & Mediana & Q1 & Q3 & Máximo & Amplitude & DP \\
+\midrule
+LOC & 71.05 & 28 & 13 & 71 & 2552 & 2551 & 145.70 \\
+WMC & 10.25 & 4 & 2 & 11 & 275 & 275 & 18.39 \\
+CBO & 8.44 & 5 & 2 & 10 & 173 & 173 & 10.51 \\
+RFC & 15.21 & 7 & 3 & 18 & 337 & 337 & 23.17 \\
+DIT & 1.60 & 1 & 0 & 2 & 9 & 9 & 1.60 \\
+LCOM5 & 1.62 & 1 & 1 & 2 & 137 & 137 & 3.03 \\
+Number of bugs & 0.0106 & 0 & 0 & 0 & 2 & 2 & 0.12 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A métrica LOC apresentou média de 71{,}05, mediana de 28, desvio padrão de 145{,}70 e valor máximo de 2552, revelando uma base composta majoritariamente por classes curtas, mas com poucas classes excepcionalmente extensas. Padrão semelhante foi observado em WMC, cuja média foi de 10{,}25, mediana de 4, desvio padrão de 18{,}39 e máximo de 275, sugerindo que a complexidade está concentrada em uma minoria de classes.
+
+Para CBO, a média foi de 8{,}44 e a mediana de 5, com máximo de 173, o que indica predomínio de baixo a moderado acoplamento, coexistindo com algumas classes altamente dependentes de outras. Já RFC apresentou média de 15{,}21, mediana de 7 e máximo de 337, revelando classes com superfícies de interação muito superiores ao padrão do sistema. Em contraste, DIT mostrou distribuição bastante concentrada, com média de 1{,}60 e mediana de 1, indicando hierarquias de herança geralmente rasas. LCOM5, com média de 1{,}62 e mediana de 1, apresentou menor dispersão relativa, embora ainda com casos extremos.
+
+A moda mostrou-se mais informativa nas variáveis discretas. Em particular, os valores modais de DIT e LCOM5 foram iguais a 1, enquanto para Number of bugs a moda foi 0, reforçando a predominância de classes sem defeitos registrados. Os percentis 90 e 95, calculados no notebook, confirmaram que os valores extremos se concentram em uma fração reduzida de observações, muito acima da faixa central da distribuição.
+
+\subsection{Distribuição dos dados e normalidade}
+
+Os histogramas da Figura~\ref{fig:normalidade} confirmam que as métricas estruturais centrais não seguem distribuições aproximadamente simétricas. LOC, WMC, CBO e RFC exibem forte concentração de massa próxima aos menores valores observados, seguida de caudas longas à direita. Em termos práticos, isso significa que a maior parte do sistema é composta por classes pequenas e relativamente simples, enquanto uma fração reduzida concentra grande volume de código, maior complexidade e maior responsabilidade de interação.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.90\textwidth]{normalidade.png}
+\caption{Histogramas com curvas de densidade para LOC, WMC, CBO e RFC}
+\label{fig:normalidade}
+\end{figure}
+
+Esse padrão reduz a representatividade da média como medida isolada de centro e torna medidas robustas, como mediana, quartis e boxplots, particularmente importantes para a interpretação da base.
+
+Nos testes de Kolmogorov-Smirnov, adotou-se a hipótese nula de normalidade e o nível de significância \(\alpha = 0{,}05\). Em todas as variáveis analisadas, os p-valores foram inferiores a 2{,}2e-16, o que levou à rejeição da hipótese nula em 100\% dos casos testados. Os valores da estatística D variaram aproximadamente entre 0{,}21 e 0{,}32, indicando afastamento consistente em relação ao comportamento normal. A interpretação desses resultados é reforçada pela inspeção gráfica: os histogramas mostram forte assimetria positiva, e os boxplots exibem grande quantidade de valores extremos. Em conjunto, esses elementos indicam que a base não atende às condições usuais de simetria e leveza de cauda associadas à distribuição normal.
+
+\subsection{Identificação de outliers}
+
+A identificação de outliers seguiu o critério clássico do boxplot, no qual observações abaixo de \(Q1 - 1{,}5 \times IQR\) ou acima de \(Q3 + 1{,}5 \times IQR\) são tratadas como valores discrepantes.
+
+Os boxplots da Figura~\ref{fig:boxplots} evidenciam grande concentração de outliers, sobretudo em LOC, WMC, CBO e RFC. Esses pontos extremos não devem ser interpretados apenas como anomalias estatísticas, mas como possíveis indícios de classes estruturalmente especiais dentro do sistema.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.90\textwidth]{boxplot.png}
+\caption{Boxplots de LOC, WMC, CBO e RFC}
+\label{fig:boxplots}
+\end{figure}
+
+Do ponto de vista de engenharia de software, valores muito altos nessas métricas podem estar associados a classes de coordenação, classes centrais de infraestrutura, componentes de agregação de responsabilidades ou classes que acumularam funcionalidades ao longo da evolução do sistema. Classes muito grandes, muito complexas ou com alta resposta de classes tendem a apresentar maior custo de manutenção, maior dificuldade de teste e maior probabilidade de introduzir defeitos quando modificadas.
+
+A comparação entre a distribuição geral das métricas e a incidência de bugs sugere que tamanho e complexidade funcionam mais como fatores de risco do que como critérios determinísticos de defeito. Em outras palavras, classes maiores e mais complexas tendem a ser mais propensas a problemas, mas a ocorrência de bugs ainda depende de fatores que não estão totalmente capturados por métricas estáticas.
+
+\subsection{Análise de correlação}
+
+A Figura~\ref{fig:dispersao} apresenta gráficos de dispersão entre pares de métricas relevantes. Observa-se associação positiva clara entre LOC e WMC, indicando que classes maiores tendem a acumular maior complexidade. De forma semelhante, CBO e RFC também crescem conjuntamente, sugerindo que classes mais acopladas tendem a exibir maior superfície de resposta e interação.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.90\textwidth]{dispersao.png}
+\caption{Gráficos de dispersão entre métricas estruturais e defeitos}
+\label{fig:dispersao}
+\end{figure}
+
+A correlação de Spearman foi utilizada em vez da correlação de Pearson porque as métricas analisadas apresentaram distribuições fortemente assimétricas à direita, grande quantidade de outliers e ausência de normalidade. Como Spearman é baseado nos postos das observações, ele é mais robusto a valores extremos e mais adequado para avaliar associações monotônicas entre métricas estruturais de software, mesmo quando a relação entre elas não é estritamente linear.
+
+A matriz de correlação da Figura~\ref{fig:correlacao} reforça esse padrão. Em particular, observam-se correlações fortes entre tamanho, complexidade, quantidade de métodos e resposta por classes. Em muitos casos, essas associações refletem dimensões estruturais parcialmente sobrepostas: classes com mais métodos e mais linhas de código naturalmente tendem a oferecer mais pontos de chamada e maior probabilidade de dependência externa.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.90\textwidth]{IMG_2098.jpg}
+\caption{Matriz de correlação com histogramas e gráficos de dispersão}
+\label{fig:correlacao}
+\end{figure}
+
+Por outro lado, as correlações entre métricas estruturais e defeitos foram fracas. Isso sugere que, embora tamanho, complexidade e acoplamento descrevam bem a estrutura do sistema, eles têm capacidade limitada de explicar diretamente a ocorrência de defeitos quando considerados isoladamente. Assim, essas métricas parecem funcionar melhor como indicadores de risco estrutural do que como preditores suficientes de bug.
+
+Para padronizar a interpretação, os coeficientes de correlação de Spearman foram classificados como fortes quando \(|\rho| \ge 0{,}70\), moderados quando \(0{,}40 \le |\rho| < 0{,}70\), e fracos quando \(|\rho| < 0{,}40\). Além da intensidade da associação, a análise considerou a possibilidade de algumas correlações refletirem proximidade conceitual entre métricas, e não necessariamente relações independentes do ponto de vista causal.
+
+\subsection{Distribuição da variável resposta e modelagem estatística}
+
+A Figura~\ref{fig:bugs} mostra a distribuição da variável Number of bugs. A base é dominada por classes sem defeito, enquanto apenas uma pequena fração apresenta um ou dois bugs. Essa característica motivou a transformação da variável resposta em uma variável binária de presença/ausência de bug para fins de regressão logística.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.70\textwidth]{frequencia.png}
+\caption{Distribuição da variável \textit{Number of bugs}}
+\label{fig:bugs}
+\end{figure}
+
+Após a binarização, observou-se forte desbalanceamento entre as classes: 7197 observações sem bug (99{,}09\%) e apenas 66 com bug (0{,}91\%). Foram ajustados quatro modelos de regressão logística, resumidos na Tabela~\ref{tab:modelos}.
+
+\begin{table}[H]
+\centering
+\caption{Comparação entre os modelos de regressão logística}
+\label{tab:modelos}
+\small
+\begin{tabular}{clrr}
+\toprule
+Modelo & Preditores & AIC & Pseudo $R^2$ \\
+\midrule
+1 & LOC & 746.77 & 0.012 \\
+2 & WMC, CBO, RFC & 724.08 & 0.048 \\
+3 & LOC, CBO, LCOM5 & 735.08 & 0.033 \\
+4 & LOC, WMC, CBO, RFC, LCOM5 & 724.86 & 0.052 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+O modelo 2 apresentou o menor AIC, o que indica melhor equilíbrio entre qualidade de ajuste e parcimônia. Embora o modelo 4 tenha alcançado pseudo $R^2$ ligeiramente superior, sua melhoria não foi suficiente para compensar o aumento de complexidade do modelo no critério AIC.
+
+A Tabela~\ref{tab:coef} apresenta os coeficientes do modelo 2, que foi adotado como principal modelo interpretativo.
+
+\begin{table}[H]
+\centering
+\caption{Coeficientes do modelo logístico selecionado (Modelo 2)}
+\label{tab:coef}
+\small
+\begin{tabular}{lrrr}
+\toprule
+Variável & Coeficiente ($\beta$) & Odds Ratio & p-valor \\
+\midrule
+WMC & 0.0207 & 1.021 & $< 0.001$ \\
+CBO & 0.0329 & 1.033 & $< 0.001$ \\
+RFC & -0.0150 & 0.985 & 0.041 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Os resultados indicam que maior complexidade (WMC) e maior acoplamento (CBO) estão associados ao aumento da probabilidade de defeito. Em termos de razão de chances, cada unidade adicional de WMC está associada a um aumento aproximado de 2{,}1\% na chance de bug, enquanto cada unidade adicional de CBO está associada a aumento de 3{,}3\%. RFC apresentou coeficiente negativo com significância marginal, o que sugere compartilhamento de informação com outras métricas estruturais do mesmo grupo.
+
+Do ponto de vista prático, o principal limite da modelagem foi o forte desbalanceamento da variável resposta. O modelo apresentou AUC de 0{,}761, indicando capacidade moderada de discriminação. Entretanto, com ponto de corte padrão de 0{,}5, o classificador não identificou corretamente observações da classe positiva, isto é, obteve sensibilidade nula nesse limiar. Esse resultado mostra que o modelo possui alguma utilidade para ranqueamento de risco, mas desempenho limitado para classificação direta em um cenário de eventos raros.
+
+Esse resultado é importante do ponto de vista conceitual: tamanho, complexidade e acoplamento ajudam a localizar classes mais arriscadas, mas ainda não explicam, por si só, a ocorrência de defeitos de forma robusta. Isso sugere que informações adicionais, como histórico de manutenção, contexto arquitetural e variáveis de processo, seriam necessárias para melhorar o desempenho preditivo.
+
+\section{Ameaças à Validade}
+
+Algumas limitações devem ser consideradas na interpretação dos resultados deste estudo. Em relação à validade externa, a análise foi realizada apenas sobre o projeto \textit{Elasticsearch}, em uma versão específica do \textit{GitHub Bug Dataset}. Assim, os resultados não devem ser generalizados automaticamente para outros projetos, linguagens de programação ou domínios de aplicação.
+
+Quanto à validade de construto, as métricas utilizadas representam propriedades estáticas do código-fonte, como tamanho, complexidade, acoplamento e coesão. Embora essas métricas sejam úteis para caracterizar a estrutura do sistema, elas não capturam fatores importantes do processo de desenvolvimento, como frequência de mudanças, experiência dos desenvolvedores, histórico de commits, criticidade dos módulos ou contexto arquitetural. Além disso, a variável \textit{Number of bugs} depende da forma como os defeitos foram registrados e associados às classes no dataset.
+
+Em relação à validade interna, as correlações observadas não devem ser interpretadas como relações causais. Por exemplo, embora LOC, WMC, CBO e RFC apresentem associações positivas entre si, isso não significa que uma métrica cause diretamente o aumento da outra ou a ocorrência de defeitos. A seleção de variáveis, a remoção de métricas altamente correlacionadas e a transformação da variável de bugs em uma variável binária também podem influenciar os resultados obtidos.
+
+Por fim, quanto à validade estatística, a base apresentou forte assimetria, grande quantidade de outliers e elevado desbalanceamento da variável resposta, com predominância de classes sem bugs. A utilização da correlação de Spearman reduziu parte dos problemas associados à não normalidade e aos valores extremos, mas as correlações com defeitos ainda devem ser interpretadas com cautela, principalmente devido à baixa quantidade de observações com bugs. Dessa forma, os resultados indicam associações e tendências estruturais, mas não constituem um modelo definitivo de predição de defeitos.
+
+\section{Conclusão}
+
+Este trabalho apresentou uma análise estatística de métricas de código-fonte do framework Elasticsearch a partir de dados do GitHub Bug Dataset. Os resultados mostraram que a estrutura do sistema é fortemente heterogênea: a maioria das classes apresenta baixo tamanho, baixa complexidade e baixo acoplamento, enquanto uma pequena fração concentra valores extremos dessas métricas.
+
+As análises gráficas e os testes de normalidade indicaram distribuições fortemente assimétricas à direita, com grande concentração de outliers. Esses resultados sugerem que medidas estruturais médias descrevem apenas parcialmente o sistema e que a interpretação deve considerar explicitamente a existência de classes críticas, potencialmente mais custosas de manter e mais suscetíveis a problemas de evolução.
+
+A análise de correlação revelou associações fortes entre tamanho, complexidade, quantidade de métodos e resposta de classes, indicando que essas dimensões estruturais crescem conjuntamente. No entanto, as correlações com defeitos foram fracas, sugerindo que métricas estáticas descrevem bem a forma do sistema, mas têm capacidade limitada de explicar, sozinhas, a ocorrência de bugs no conjunto de dados utilizado.
+
+Na modelagem estatística, complexidade e acoplamento apresentaram associação significativa com a presença de defeitos, enquanto o tamanho perdeu importância quando controlado por outras métricas. Ainda assim, o baixo pseudo $R^2$, a AUC apenas moderada e o forte desbalanceamento da variável resposta mostram que a predição de bugs permanece limitada quando baseada apenas em métricas estruturais. De modo geral, conclui-se que métricas de código são úteis como indicadores de risco e de criticidade estrutural, mas não substituem informações sobre processo, histórico de manutenção e contexto arquitetural na explicação de defeitos.
+
+Como continuidade, trabalhos futuros podem incorporar métricas históricas e de processo, bem como comparar o desempenho de modelos alternativos em cenários de forte desbalanceamento, a fim de verificar se a capacidade preditiva pode ser ampliada sem perda relevante de interpretabilidade.
+
+\newpage
+\section{Repositório do Projeto}
+
+O material completo deste trabalho, incluindo scripts em R, dataset selecionado, figuras geradas e arquivos auxiliares, está disponível no seguinte repositório GitHub:
+
+\begin{quote}
+\url{https://github.com/marceufilho/artigo-bugs-databese}
+\end{quote}
+
+\noindent
+O repositório contém os scripts em R, o dataset utilizado, as figuras geradas e os arquivos auxiliares que permitem reproduzir a análise apresentada no artigo.
+
+\begin{thebibliography}{99}
+
+\bibitem{githubbugdataset}
+Ferenc, R. et al. GitHub Bug Dataset -- version 1.1. Disponível em:
+\url{https://www.inf.u-szeged.hu/~ferenc/papers/GitHubBugDataSet/}. Acesso em: 11 abr. 2026.
+
+\bibitem{elastic}
+Elastic. Elasticsearch. Disponível em:
+\url{https://www.elastic.co/elasticsearch}. Acesso em: 11 abr. 2026.
+
+\bibitem{ck1994}
+Chidamber, S. R.; Kemerer, C. F. A metrics suite for object oriented design.
+\textit{IEEE Transactions on Software Engineering}, v. 20, n. 6, p. 476--493, 1994.
+
+\bibitem{basili1996}
+Basili, V. R.; Briand, L. C.; Melo, W. L. A validation of object-oriented design metrics as quality indicators.
+\textit{IEEE Transactions on Software Engineering}, v. 22, n. 10, p. 751--761, 1996.
+
+\bibitem{hosmer2013}
+Hosmer, D. W.; Lemeshow, S.; Sturdivant, R. X.
+\textit{Applied Logistic Regression}. 3. ed. Hoboken: Wiley, 2013.
+
+\end{thebibliography}
+
+\newpage
+\appendix
+\section{Apêndice: Descrição das Métricas Utilizadas}
+A Tabela~\ref{tab:metricas} apresenta uma definição resumida das métricas utilizadas na análise.
+\begin{table}[H]
+\centering
+\caption{Descrição resumida das métricas utilizadas}
+\label{tab:metricas}
+\small
+\begin{tabular}{p{0.25\textwidth} p{0.65\textwidth}}
+\toprule
+\textbf{Métrica} & \textbf{Definição} \\
+\midrule
+LOC & Número de linhas de código da classe, usado como indicador de tamanho. \\
+CLOC & Número de linhas de comentário presentes no código da classe. \\
+WMC & Mede a complexidade total dos métodos de uma classe. \\
+CBO & Mede o grau de acoplamento entre uma classe e outras classes do sistema. \\
+RFC & Mede o conjunto de métodos que podem ser executados em resposta a uma chamada à classe. \\
+DIT & Mede a profundidade da classe na hierarquia de herança. \\
+LCOM5 & Mede a falta de coesão entre os métodos de uma classe. \\
+NM & Número total de métodos definidos em uma classe. \\
+NPM & Número de métodos públicos definidos em uma classe. \\
+WarningMajor & Quantidade de alertas de maior severidade identificados por análise estática. \\
+Design Rules & Quantidade de violações relacionadas a regras de projeto do código. \\
+Coupling Metric Rules & Quantidade de violações relacionadas a regras de acoplamento entre classes. \\
+Documentation Metric Rules & Quantidade de violações relacionadas à documentação do código. \\
+Size Metric Rules & Quantidade de violações relacionadas ao tamanho de elementos do código. \\
+Number of bugs & Quantidade de bugs associados a uma classe no conjunto de dados. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}

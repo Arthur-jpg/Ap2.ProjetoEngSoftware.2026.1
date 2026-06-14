@@ -29,7 +29,7 @@ def main():
         run_fase2()
 
     if args.fase is None or args.fase == 3:
-        log.info("=== Fase 3: SourceMeter ===")
+        log.info("=== Fase 3: CK (métricas OO) ===")
         from run_sourcemeter import run_fase3
         run_fase3()
 

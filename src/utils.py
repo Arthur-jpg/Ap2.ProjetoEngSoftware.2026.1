@@ -18,7 +18,7 @@ def run(cmd: list[str], cwd: Path | None = None, check: bool = True) -> subproce
 
 
 def normalize_class_name(name: str) -> str:
-    """Normaliza nome de classe para o join entre SourceMeter e SpotBugs."""
+    """Normaliza nome de classe para o join entre CK e SpotBugs."""
     # Remove sufixos de classes internas anônimas ($1, $2, ...)
     return name.split("$")[0]
 
